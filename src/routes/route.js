@@ -10,4 +10,6 @@ router.post("/register",userController.createUser)
 router.post("/login",userController.loginUser)
 router.post("/books",middleware.authentication,middleware.authorisation, bookController.createBook)
 router.get("/books",bookController.getBooks)
+router.get("books/:bookId",bookController.getBookById)
+router.delete("/books/:bookId",bookController.deleteById)
 module.exports = router
