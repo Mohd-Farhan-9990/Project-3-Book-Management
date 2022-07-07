@@ -148,6 +148,74 @@ const getBookById = async (req, res) => {
     }
 }
 
+const updateBooks = async function (req, res) {
+    try {
+        let data = req.body;
+        let bookId = req.params.bookId
+        let { title, excerpt, releasedAt, ISBN } = data   // destructring
+
+        if (Object.keys(data).length == 0) {
+            return res.status(400).send({ status: false, msg: "please provide details what you want to update" })
+        }
+        if (!bookId) {
+            return res.status(400).send({ status: false, msg: "please enter bookId in params" })
+        }
+        let books = await bookModel.findOne({ _id: bookId, isDeleted: false })
+        if (!books) {
+            return res.status(404).send({ status: false, msg: "No such book found" })
+        }
+        if (!title) {
+            return res.status(400).send({ status: false, msg: " title is required to update" })
+        }
+        if (!/^[a-zA-Z \s]+$/.test(title)) {
+            return res.status(400).send({ status: false, msg: "Please Enter Only Alphabets in title" })
+        }
+
+        let titleAlreadyUsed = await bookModel.findOne({ title: title })
+        if (titleAlreadyUsed) {
+            return res.status(400).send({ status: false, msg: "title Already exist please provide another title" })
+        }
+        if (!ISBN) {
+            return res.status(400).send({ status: false, msg: " ISBN is required to update" })
+        }
+
+        if (!/^\+?([0-9]{3})\)?[-. ]?([0-9]{10})$/.test(ISBN)) {
+            return res.status(400).send({ status: false, message: 'Please provide a valid ISBN(ISBN should be 13 digit)' })
+        }
+
+        let ISBNAlreadyUsed = await bookModel.findOne({ ISBN: ISBN })
+        if (ISBNAlreadyUsed) {
+            return res.status(400).send({ status: false, msg: "ISBN Already exist please provide another ISBN" })
+        }
+        if (!excerpt) {
+            return res.status(400).send({ status: false, msg: "excerpt is required to update" })
+        }
+
+        if (!/^[a-zA-Z \s]+$/.test(excerpt)) {
+            return res.status(400).send({ status: false, msg: "Please Enter Only Alphabets in excerpt" })
+        }
+        if (!releasedAt) {
+            return res.status(400).send({ status: false, msg: "releaseAt is required to update" })
+        }
+        if (releasedAt) {
+            if (!/((\d{4}[\/-])(\d{2}[\/-])(\d{2}))/.test(releasedAt)) {
+                return res
+                    .status(400)
+                    .send({
+                        status: false,
+                        message: "Please provide a valid Date(YYYY-MM-DD)",
+                    });
+            }
+            const updatedBookData = await bookModel.findOneAndUpdate({ _id: bookId, isDeleted: false }, { title: title, excerpt: excerpt, releasedAt: releasedAt, ISBN: ISBN }, { new: true })
+            res.status(200).send({ status: true, msg: "successfully update book details", data: updatedBookData })
+
+        }
+    }
+    catch (err) {
+        return res.status(500).send({ status: false, msg: err.message })
+    }
+
+}
 
 
 const deleteById = async function (req,res){
@@ -175,4 +243,4 @@ const deleteById = async function (req,res){
     }                                               
 
 }
-module.exports = { createBook, getBooks,getBookById,deleteById }
+module.exports = { createBook, getBooks,getBookById,deleteById,updateBooks }
