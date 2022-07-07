@@ -7,7 +7,7 @@ const userModel = require("../models/userModel");
 
 const authentication = async function (req, res, next) {
     try {
-        let userId = req.body;
+        let userId = req.body.userId;
         let user = await userModel.findById({ _id: userId })
         if (!user) {
             return res.status(404).send({ status: false, msg: "No such user exist" })
@@ -40,7 +40,7 @@ const authorisation = function (req, res, next) {
         let token = req.headers["x-api-key"]
         if(!token)token = req.headers["X-API-KEY"]
         let decodedtoken = jwt.verify(token, "Project-3-Group-43")
-        let userId = req.body;
+        let userId = req.body.userId;
         if (decodedtoken.userId != userId) {
             return res.status(403).send({ status: false, msg: "you are not authorise" })
         }
