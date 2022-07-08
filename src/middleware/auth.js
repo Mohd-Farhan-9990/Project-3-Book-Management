@@ -8,10 +8,10 @@ const userModel = require("../models/userModel");
 const authentication = async function (req, res, next) {
     try {
         let userId = req.body.userId;
-        let user = await userModel.findById({ _id: userId })
-        if (!user) {
-            return res.status(404).send({ status: false, msg: "No such user exist" })
-        }
+        // let user = await userModel.findById({ _id: userId })
+        // if (!user) {
+        //     return res.status(404).send({ status: false, msg: "No such user exist" })
+        // }
 
         let token = req.headers["x-api-key"]
         if (!token) token = req.headers["X-API-KEY"]
@@ -23,6 +23,7 @@ const authentication = async function (req, res, next) {
         if (!decodedtoken) {
             return res.status(401).send({ status: false, msg: "invalid token" })
         }
+        req.userId = decodedtoken.userId;
 
 
         next()

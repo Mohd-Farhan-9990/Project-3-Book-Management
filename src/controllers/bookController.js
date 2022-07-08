@@ -1,6 +1,7 @@
 const { isValidObjectId ,default:mongoose} = require("mongoose");
 const bookModel = require("../models/bookModel")
 const userModel = require("../models/userModel")
+const reviewModel = require("../models/reviewModel");
 const moment = require('moment')
 
 const createBook = async function (req, res) {
@@ -32,6 +33,10 @@ const createBook = async function (req, res) {
         }
         if (!userId) {
             return res.status(400).send({ status: false, msg: "please enter userId" })
+        }
+        let user = await userModel.findById({ _id: userId })
+        if (!user) {
+            return res.status(404).send({ status: false, msg: "No such user exist" })
         }
         if (!isValidObjectId(userId)) {
             return res.status(400).send({ status: false, msg: " invalid objectId" })
@@ -154,12 +159,14 @@ const updateBooks = async function (req, res) {
         let bookId = req.params.bookId
         let { title, excerpt, releasedAt, ISBN } = data   // destructring
 
+
+        
+        
         if (Object.keys(data).length == 0) {
             return res.status(400).send({ status: false, msg: "please provide details what you want to update" })
         }
-        if (!bookId) {
-            return res.status(400).send({ status: false, msg: "please enter bookId in params" })
-        }
+       
+
         let books = await bookModel.findOne({ _id: bookId, isDeleted: false })
         if (!books) {
             return res.status(404).send({ status: false, msg: "No such book found" })
@@ -221,7 +228,6 @@ const updateBooks = async function (req, res) {
 const deleteById = async function (req,res){
     try{
             let bookId = req.params.bookId
-            console.log(bookId)
             let bookexist = await bookModel.findOne({_id:bookId,isDeleted:false})
             if(!bookexist){
                 return res.status(404).send({status:false,msg:"Book Not Found"})                                  
