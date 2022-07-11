@@ -4,8 +4,10 @@ const userModel = require("../models/userModel")
 const reviewModel = require("../models/reviewModel");
 const moment = require('moment')
 
-const createBook = async function (req, res) {
 
+//================================================== Creating Books =====================================================
+
+const createBook = async function (req, res) {
     try {
 
         let data = req.body;
@@ -22,9 +24,9 @@ const createBook = async function (req, res) {
         if (checktitle){
              return res.status(400).send({ status: false, message: "Title Already Exists" })
         }
-        if (!/^[a-zA-Z \s]+$/.test(title)) {
-            return res.status(400).send({ status: false, msg: "Please Enter Only Alphabets in title" })
-        }
+        // if (!/^[a-zA-Z \s]+$/.test(title)) {
+        //     return res.status(400).send({ status: false, msg: "Please Enter Only Alphabets in title" })
+        // }
         if (!excerpt) {
             return res.status(400).send({ status: false, msg: "please enter excerpt" })
         }
@@ -82,7 +84,7 @@ const createBook = async function (req, res) {
     }
 }
 
-//=================================================Get Books Api========================================================
+//================================================= Get Books Api ========================================================
 
 const getBooks = async (req, res) => {
     try {
@@ -126,25 +128,15 @@ const getBooks = async (req, res) => {
     }
 }
 
+//================================================= Get Book By Id =======================================================
+
 const getBookById = async (req, res) => {
     try {
         let id = req.params.bookId;
 
-        if(!id){
-            res.status(400).send({status: false, message: "Please enter a book ID."});
-        }
-        if(!mongoose.Types.ObjectId.isValid(id)){
-            res.status(400).send({status: false, message: 'Invalid book id'});
-        }
-
-        let bookData = await bookModel.findById(id).select({ISBN: 0, deletedAt: 0, _v: 0});
-        if(!bookData){
-            res.status(404).send({status: false, message: 'No Book exists with that id'});
-        }
-        
-        let reviews = await reviewModel.find({bookId: id})
-        let temp = JSON.stringify(bookData);
-        let result = JSON.parse(temp);
+        let bookData = await bookModel.findOne({_id: id, isDeleted: false}).select({__v: 0})
+        let reviews = await reviewModel.find({bookId: id}).select({_id:0,__v:0})
+       let result = bookData.toObject()
         result.reviewsData = reviews;
 
         res.send({status: true, message: 'Book list', data: result});
@@ -152,6 +144,8 @@ const getBookById = async (req, res) => {
         res.status(500).send({ status: false, message: err.message });
     }
 }
+
+//===================================================== Update Books =====================================================
 
 const updateBooks = async function (req, res) {
     try {
@@ -224,6 +218,7 @@ const updateBooks = async function (req, res) {
 
 }
 
+//================================================== Delete Book By Id ====================================================
 
 const deleteById = async function (req,res){
     try{
