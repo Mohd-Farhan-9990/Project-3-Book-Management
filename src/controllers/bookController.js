@@ -137,6 +137,7 @@ const getBookById = async (req, res) => {
         let id = req.params.bookId;
 
         let bookData = await bookModel.findOne({_id: id, isDeleted: false}).select({__v: 0})
+        if(!bookData) return res.status(404).send({status:false, message: 'No Book found with that id'});
         let reviews = await reviewModel.find({bookId: id,isDeleted:false}).select({_id:0,__v:0})
         let result = bookData.toObject()
         result.reviewsData = reviews;
