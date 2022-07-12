@@ -65,7 +65,7 @@ const createBook = async function (req, res) {
         }
 
         if (!subcategory) {
-            return res.status(400).send({ status: false, msg: "please ented subcategory" })
+            return res.status(400).send({ status: false, msg: "please enter subcategory" })
         }
         if (!/^[a-zA-Z \s]+$/.test(subcategory)) {
             return res.status(400).send({ status: false, msg: "Please Enter Only Alphabets in subcategory" })
