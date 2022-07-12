@@ -68,7 +68,10 @@ const updateReview = async (req, res) => {
         let bookId = req.params.bookId;
         let reviewId = req.params.reviewId;
         let data = req.body;
-
+    
+        if (Object.keys(data).length == 0) {
+            return res.status(400).send({ status: false, msg: "please enter require data to update Reviews" })
+        }
         let book = await bookModel.findById(bookId);
         if(book){
             if(book['isDeleted'] == true) return res.status(400).send({status: false, message: "The book has been deleted"});
