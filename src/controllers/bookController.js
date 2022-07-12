@@ -167,7 +167,9 @@ const updateBook = async (req, res) => {
 
         let data = req.body;
         let {title, excerpt, ISBN, releasedAt} = data;
-    
+        if (Object.keys(data).length == 0) {
+            return res.status(400).send({ status: false, msg: "please enter require data to Update Book" })
+        }
 
 
         if(title){
