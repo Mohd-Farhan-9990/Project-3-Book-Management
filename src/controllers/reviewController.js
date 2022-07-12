@@ -23,10 +23,18 @@ const createReview = async (req, res) => {
             }
             let bookexist = await bookModel.findById(bookId)
             if(!bookexist){return res.status(403).send({status:false,msg:"No Book Found"})}
-            if(bookexist['isDeleted']===true){return res.status(400).send({status:false,msg:"Book Has been Deletes"})}
+            if(bookexist['isDeleted']===true){return res.status(400).send({status:false,msg:"Book Has been Deleted"})}
         
             if(!data.rating){
                 return res.status(400).send({status: false,msg:"Please Provide some rating"})
+
+            }
+            if(isNaN(data.rating)){
+                return res.status(400).send({status: false,msg:"Please Enter Only Number in rating"})
+
+            }
+            if(data.rating<1 || data.rating>5){
+                return res.status(400).send({status: false,msg:"Please rating btwn 1-5"})
 
             }
             if(!data.reviewedBy){
@@ -42,10 +50,9 @@ const createReview = async (req, res) => {
             data['reviewedAt'] = reviewedAt
 
             const reviewes = await reviewModel.create(data)
-            if(reviewes){
-                const bookReviwes = await bookModel.findOneAndUpdate({_id:data.bookId},{$inc:{reviews:+1}},{new:true})
-            }
-            let result = bookexist.toObject()
+            const bookReviwes = await bookModel.findOneAndUpdate({_id:data.bookId},{$inc:{reviews:+1}},{new:true})
+
+            let result = bookReviwes.toObject()
             result.reviewData = reviewes
             return res.status(201).send({status:true, msg:"Reviewes Added Succesfully",data:result})
         
@@ -54,6 +61,7 @@ const createReview = async (req, res) => {
     }
 }
 
+//=========================================== Updating Reviews ===========================================================
 
 const updateReview = async (req, res) => {
     try{
@@ -80,6 +88,8 @@ const updateReview = async (req, res) => {
         res.status(500).send({ status: false, message: err.message });
     }
 }
+
+//================================================== Deleting Reviews ===================================================
 
 const deleteReview = async (req, res) => {
     try{

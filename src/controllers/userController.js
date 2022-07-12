@@ -1,6 +1,7 @@
 const userModel =require("../models/userModel")
 const jwt = require('jsonwebtoken')
 
+//=========================================== Registering User Here ======================================================
 
 const createUser = async function(req,res){
    
@@ -64,11 +65,17 @@ const createUser = async function(req,res){
     }
 }
 
+//============================================ Login Api =====================================================
+
 const loginUser = async function(req,res){
     try{
 
         const data = req.body
         const {email,password} = data
+        if(Object.keys(data).length==0){
+            return res.status(400).send({status:false,msg:"Please Enter email and Password"})
+
+        }
         if(!email){
             return res.status(400).send({status:false,msg:"Please Enter email"})
         }
@@ -80,6 +87,8 @@ const loginUser = async function(req,res){
             return res.status(401).send({status:false,msg:"Invalid User"})
 
         }
+
+// Creating Token Here
 
         const token = jwt.sign({
             userId:user._id.toString(),
