@@ -21,6 +21,14 @@ router.post("/books/:bookId/review",reviewController.createReview)
 router.put("/books/:bookId/review/:reviewId",reviewController.updateReview)
 router.delete("/books/:bookId/review/:reviewId",reviewController.deleteReview)
 
+
+router.all("/****", function (req, res) {
+    res.status(404).send({
+        status: false,
+        message: "Make Sure Your Endpoint is Correct or Not!"
+    })
+})
+
 module.exports = router
 
 

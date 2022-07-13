@@ -47,9 +47,11 @@ const createBook = async function (req, res) {
         if (!ISBN) {
             return res.status(400).send({ status: false, msg: "please enter ISBN" })
         }
+        
         if (!/^\+?([1-9]{3})\)?[-. ]?([0-9]{10})$/.test(ISBN)) {
             return res.status(400).send({ status: false, message: 'Please provide a valid ISBN(ISBN should be 13 digit)' })
         }
+
 
         let checkISBN = await bookModel.findOne({ ISBN: ISBN })
 
@@ -72,7 +74,8 @@ const createBook = async function (req, res) {
         }
 //Creating Data Here
 
-        let date = Date.now()                                               //getting timestamps value
+        let date = Date.now()    
+        console.log(date)                                           //getting timestamps value
         let releasedAt = moment(date).format('YYYY-MM-DD, hh:mm:ss')        //formatting date
         data['releasedAt'] = releasedAt
         let savedData = await bookModel.create(data)
