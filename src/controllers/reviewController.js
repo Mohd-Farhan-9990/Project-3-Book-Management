@@ -72,11 +72,21 @@ const updateReview = async (req, res) => {
         if (Object.keys(data).length == 0) {
             return res.status(400).send({ status: false, msg: "please enter require data to update review" })
         }
+        if(data.reviewedAt || data.bookId || data.isDeleted){
+            return res.status(400).send({status: false,msg:"You can not update reviewedAt or bookId or Deleted"})
+
+        }
+        if(!isValidObjectId(bookId)){
+            return res.status(400).send({status: false,msg:"Invalid BookId"})
+        }
         let book = await bookModel.findById(bookId);
         if(book){
             if(book['isDeleted'] == true) return res.status(400).send({status: false, message: "The book has been deleted"});
         }else return res.status(404).send({status: false, message: "Book not found"});
 
+        if(!isValidObjectId(reviewId)){
+            return res.status(400).send({status: false,msg:"Invalid reviewId"})
+        }
         let review = await reviewModel.findById(reviewId);
         if(review){
         
@@ -100,11 +110,17 @@ const deleteReview = async (req, res) => {
         let bookId = req.params.bookId;
         let reviewId = req.params.reviewId;
 
+        if(!isValidObjectId(bookId)){
+            return res.status(400).send({status: false,msg:"Invalid BookId"})
+        }
         let book = await bookModel.findById(bookId);
         if(book){
             if(book['isDeleted'] == true) return res.status(400).send({status: false, message: "The book has been deleted"});
         }else return res.status(404).send({status: false, message: "Book not found"});
 
+        if(!isValidObjectId(reviewId)){
+            return res.status(400).send({status: false,msg:"Invalid reviewId"})
+        }
         let review = await reviewModel.findById(reviewId);
         if(review){
             if(review['isDeleted'] == true) return res.status(400).send({status: false, message:"Review has been deleted"});

@@ -53,6 +53,26 @@ const createUser = async function(req,res){
         if(!address){
             return res.status(400).send({status:false,msg:"Please Enter address"})
         }
+        if(address){
+            if(!(address.street.trim())){
+                return res.status(400).send({status:false,msg:"Please Enter street in Address"})
+            }
+            
+            if(!(address.city.trim())){
+                return res.status(400).send({status:false,msg:"Please Enter City in Address"})
+            }
+            if(!isNaN(address.city)){
+                return res.status(400).send({status:false,msg:"Please donot Enter City in Address as Number"})
+
+            }
+            if(!(address.pincode.trim())){
+                return res.status(400).send({status:false,msg:"Please Enter PinCode in Address"})
+            }
+            if(isNaN(address.pincode)){
+                return res.status(400).send({status:false,msg:"Please  Enter PinCode in Address as Number"})
+
+            }
+        }
 
         name = name.replace(/\s\s+/g, ' ')
         data['name'] = name
@@ -92,7 +112,9 @@ const loginUser = async function(req,res){
 
         const token = jwt.sign({
             userId:user._id.toString(),
-          expiresIn: "30d" },
+          expiresIn: "30d",
+          iat: Math.floor(Date.now() / 1000),
+        },
              "Project-3-Group-43"
             )
         res.setHeader("x-api-key",token)

@@ -14,7 +14,7 @@ const createBook = async function (req, res) {
         if (Object.keys(data).length == 0) {
             return res.status(400).send({ status: false, msg: "please enter require data to create Book" })
         }
-        const { title, excerpt, userId, ISBN, category, subcategory } = data;
+        let { title, excerpt, userId, ISBN, category, subcategory,releasedAt } = data;
 
         if (!title) {
             return res.status(400).send({ status: false, msg: "please enter Book title" })
@@ -56,25 +56,30 @@ const createBook = async function (req, res) {
         if (checkISBN){
              return res.status(400).send({ status: false, message: "ISBN Already Exists" })
         }
-
-        if (!category) {
+        
+        if (!(category.trim())) {
             return res.status(400).send({ status: false, msg: "please enter Book category" })
         }
         if (!/^[a-zA-Z \s]+$/.test(category)) {
             return res.status(400).send({ status: false, msg: "Please Enter Only Alphabets in Category" })
         }
 
-        if (!subcategory) {
+        if (!(subcategory.trim())) {
             return res.status(400).send({ status: false, msg: "please enter subcategory" })
         }
         if (!/^[a-zA-Z \s]+$/.test(subcategory)) {
             return res.status(400).send({ status: false, msg: "Please Enter Only Alphabets in subcategory" })
         }
+        if(releasedAt){
+            if(!/^(19|20)\d{2}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$/.test(releasedAt)) return res.status(400).send({status: false, message:"Enter date in YYYY-MM-DD format"});
+            releasedAt = new Date().toISOString()
+        }
 //Creating Data Here
-
+        if(!releasedAt){
         let date = Date.now()                                               //getting timestamps value
-        let releasedAt = moment(date).format('YYYY-MM-DD, hh:mm:ss')        //formatting date
+          releasedAt = moment(date).format('YYYY-MM-DD, hh:mm:ss')        //formatting date
         data['releasedAt'] = releasedAt
+        }
         let savedData = await bookModel.create(data)
         return res.status(201).send({ status: true, msg: "success", data: savedData })
 
