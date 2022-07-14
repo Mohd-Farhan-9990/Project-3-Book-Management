@@ -5,6 +5,10 @@ const {default:mongoose} = require('mongoose')
 const bodyParser = require('body-parser')
 const app =express()
 
+const multer=require('multer');
+ app.use(multer().any())
+
+
 app.use(bodyParser.json())
 
 const url = "mongodb+srv://MohdFarhan9990:LxP62162nUtlmSsp@cluster0.1zhmxfg.mongodb.net/group43Database"

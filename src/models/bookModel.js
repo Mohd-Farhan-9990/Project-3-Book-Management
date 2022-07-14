@@ -35,6 +35,10 @@ const bookSchema = mongoose.Schema({
         type: Number,
         default: 0
     },
+    bookImage:{
+        type:String,
+        required:true
+    },
     deletedAt: {
         type: Date
     },
