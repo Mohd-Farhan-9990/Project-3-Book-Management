@@ -79,6 +79,7 @@ const updateReview = async (req, res) => {
 
         let review = await reviewModel.findById(reviewId);
         if(review){
+        
             if(review['isDeleted'] == true) return res.status(400).send({status: false, message:"Review has been deleted"});
         }else return res.status(404).send({status: false, message: "Review not found"});
 
