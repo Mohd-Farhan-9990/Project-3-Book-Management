@@ -3,7 +3,56 @@ const bookModel = require("../models/bookModel")
 const userModel = require("../models/userModel")
 const reviewModel = require("../models/reviewModel");
 const moment = require('moment')
+const aws = require('aws-sdk')
 
+//=================================================AWS COnfig ===============================================================
+aws.config.update({
+    accessKeyId: "AKIAY3L35MCRVFM24Q7U",
+    secretAccessKeyId: "qGG1HE0qRixcW1T1Wg1bv+08tQrIkFVyDFqSft4J",
+    region: "ap-south-1"
+})
+
+let uploadFile= async ( file) =>{
+   return new Promise( function(resolve, reject) {                                     // this function will upload file to aws and return the link
+    let s3= new aws.S3({apiVersion: '2006-03-01'});                                     // we will be using the s3 service of aws
+
+    var uploadParams= {
+        ACL: "public-read",
+        Bucket: "classroom-training-bucket",  
+        Key: "abc/" + file.originalname,  
+        Body: file.buffer
+    }
+
+
+    s3.upload( uploadParams, function (err, data ){
+        if(err) {
+            return reject({"error": err})
+        }
+        return resolve(data.Location)
+    })
+
+   })
+}
+
+
+//==============================================Uploading Image Here ========================================================
+const imageUpload = async(req,res) =>{
+    try{
+        let files= req.files
+        console.log(files)
+        if(files && files.length>0){
+            let url = await uploadFile( files[0] )
+            res.status(201).send({msg: "file uploaded succesfully", URLofImage:url})
+        }
+        else{
+            res.status(400).send({ msg: "No file found" })
+        }
+        
+    }
+    catch(err){
+        res.status(500).send({msg: err})
+    }
+}
 
 //================================================== Creating Books =====================================================
 
@@ -14,7 +63,7 @@ const createBook = async function (req, res) {
         if (Object.keys(data).length == 0) {
             return res.status(400).send({ status: false, msg: "please enter require data to create Book" })
         }
-        let { title, excerpt, userId, ISBN, category, subcategory,releasedAt } = data;
+        let { title, excerpt, userId, ISBN, category, subcategory,releasedAt,coverImage } = data;
 
         if (!title) {
             return res.status(400).send({ status: false, msg: "please enter Book title" })
@@ -57,7 +106,7 @@ const createBook = async function (req, res) {
              return res.status(400).send({ status: false, message: "ISBN Already Exists" })
         }
         
-        if (!(category.trim())) {
+        if (!(category.trim())) {     
             return res.status(400).send({ status: false, msg: "please enter Book category" })
         }
         if (!/^[a-zA-Z \s]+$/.test(category)) {
@@ -73,6 +122,9 @@ const createBook = async function (req, res) {
         if(releasedAt){
             if(!/^(19|20)\d{2}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$/.test(releasedAt)) return res.status(400).send({status: false, message:"Enter date in YYYY-MM-DD format"});
             releasedAt = new Date().toISOString()
+        }
+        if(!coverImage){
+            return res.status(400).send({ status: false, msg: "Please Enter Cover Image URL" })
         }
 //Creating Data Here
         if(!releasedAt){
@@ -241,4 +293,4 @@ const deleteById = async function (req,res){
     }                                               
 
 }
-module.exports = { createBook, getBooks,getBookById,deleteById,updateBook }
+module.exports = { createBook, getBooks,getBookById,deleteById,updateBook,imageUpload }

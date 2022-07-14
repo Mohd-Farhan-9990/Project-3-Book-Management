@@ -8,7 +8,7 @@ const bookModel = require("../models/bookModel");
 
 const authentication = async function (req, res, next) {
     try {
-        let userId = req.body.userId;
+        // let userId = req.body.userId;
         // let user = await userModel.findById({ _id: userId })
         // if (!user) {
         //     return res.status(404).send({ status: false, msg: "No such user exist" })

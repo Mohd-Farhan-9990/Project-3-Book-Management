@@ -50,6 +50,7 @@ const bookSchema = mongoose.Schema({
         type: Date,
         required: true
     },
+    coverImage:{type:String}
 },{ timestapms: true })
 
 module.exports =mongoose.model("Book",bookSchema)
